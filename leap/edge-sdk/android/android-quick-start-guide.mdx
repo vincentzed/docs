@@ -68,7 +68,6 @@ The `LeapDownloader.loadModel` suspend function loads a model and returns a mode
 
 ```kotlin
 try {
-  // Point to the JSON manifest URL in the LeapBundles repo
   val baseDir = File(context.filesDir, "model_files").absolutePath
   val modelDownloader = LeapDownloader(config = LeapDownloaderConfig(saveDir = baseDir))
   val modelRunner = modelDownloader.loadModel(
