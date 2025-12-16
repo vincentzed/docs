@@ -7,10 +7,6 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Getting started',
       collapsed: false,
-      link: {
-        type: 'doc',
-        id: 'getting-started/quickstart',
-      },
       items: [
         'getting-started/intro',
         'getting-started/quickstart', // Keep in nav, but pagination will skip it
@@ -24,7 +20,7 @@ const sidebars: SidebarsConfig = {
       collapsed: true,
       items: [
         'key-concepts/chat-template',
-        'getting-started/text-generation-and-prompting',
+        'key-concepts/text-generation-and-prompting',
         'key-concepts/tool-use',
       ],
     },
