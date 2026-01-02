@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Changelog
 
-## `v0.9.0` - unreleased
+## `v0.9.0` - 2026-01-02
 
 **New features**
 
