@@ -36,7 +36,7 @@ The LFM model collection includes general-purpose language models, vision-langua
 <td style={{textAlign: 'left'}}>LFM2.5-1.2B-Instruct</td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-GGUF" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
-<td style={{color: '#ef4444'}}>✗</td>
+<td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-MLX-8bit" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-Instruct-ONNX" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td>Yes (TRL)</td>
 </tr>
@@ -52,7 +52,7 @@ The LFM model collection includes general-purpose language models, vision-langua
 <td style={{textAlign: 'left'}}>LFM2.5-1.2B-JP</td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-JP" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-JP-GGUF" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
-<td style={{color: '#ef4444'}}>✗</td>
+<td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-JP-MLX-8bit" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-1.2B-JP-ONNX" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td>Yes (TRL)</td>
 </tr>
@@ -149,7 +149,7 @@ The LFM model collection includes general-purpose language models, vision-langua
 <tr>
 <td style={{textAlign: 'left'}}>LFM2.5-Audio-1.5B</td>
 <td><a href="https://huggingface.co/LiquidAI/LFM2.5-Audio-1.5B" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
-<td style={{color: '#ef4444'}}>✗</td>
+<td><a href="https://huggingface.co/LiquidAI/LFM2.5-Audio-1.5B-GGUF" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
 <td style={{color: '#ef4444'}}>✗</td>
 <td style={{color: '#ef4444'}}>✗</td>
 <td>Yes (TRL)</td>
