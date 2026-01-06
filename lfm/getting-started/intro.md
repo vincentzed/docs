@@ -127,7 +127,7 @@ Built on a new hybrid architecture, LFM2 sets a new standard in terms of quality
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1500px) {
   .get-started-grid {
     grid-template-columns: repeat(4, 1fr);
   }
