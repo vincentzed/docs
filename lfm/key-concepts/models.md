@@ -232,6 +232,14 @@ The LFM model collection includes general-purpose language models, vision-langua
 <td style={{color: '#ef4444'}}>✗</td>
 <td>Yes (PyLate)</td>
 </tr>
+<tr>
+<td style={{textAlign: 'left'}}>LFM2-2.6B-Transcript</td>
+<td><a href="https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
+<td><a href="https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript-GGUF" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
+<td style={{color: '#ef4444'}}>✗</td>
+<td><a href="https://huggingface.co/onnx-community/LFM2-2.6B-Transcript-ONNX" style={{color: '#22c55e', textDecoration: 'none'}}>✓</a></td>
+<td>Yes (TRL)</td>
+</tr>
 </tbody>
 </table>
 
@@ -313,6 +321,7 @@ The LFM model collection includes general-purpose language models, vision-langua
 | [`LiquidAI/LFM2-350M-Math`](https://huggingface.co/LiquidAI/LFM2-350M-Math) | Tiny reasoning model designed for tackling tricky math problems. |
 | [`LiquidAI/LFM2-350M-PII-Extract-JP`](https://huggingface.co/LiquidAI/LFM2-350M-PII-Extract-JP) | Extract personally identifiable information (PII) from Japanese text and output it in JSON format. |
 | [`LiquidAI/LFM2-ColBERT-350M`](https://huggingface.co/LiquidAI/LFM2-ColBERT-350M) | Embed documents and queries for fast retrieval and reranking across many languages. |
+| [`LiquidAI/LFM2-2.6B-Transcript`](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript) | Designed for private, on-device meeting summarization. |
 
 ## GGUF Models
 
