@@ -322,3 +322,93 @@ Extract <address>, <company_name>, <email_address>, <human_name>, <phone_number>
 </details>
 
 ⚠️ **The model is intended for single turn conversations.**
+
+---
+
+### LFM2-2.6B-Transcript
+
+Designed for private, on-device meeting summarization. Use `temperature=0.3` for optimal results.
+
+**Generation Parameters:**
+- `temperature=0.3` (strongly recommended)
+
+**System Prompt Format:**
+```
+You are an expert meeting analyst. Analyze the transcript carefully and provide clear, accurate information based on the content.
+```
+
+**Input Format:**
+
+The model expects meeting transcripts in a specific format:
+
+```
+<user_prompt>
+
+Title (example: Claims Processing training module)
+Date (example: July 2, 2021)
+Time (example: 1:00 PM)
+Duration (example: 45 minutes)
+Participants (example: Julie Franco (Training Facilitator), Amanda Newman (Subject Matter Expert))
+----------
+**Speaker 1**: Message 1 (example: **Julie Franco**: Good morning, everyone. Thanks for joining me today.)
+**Speaker 2**: Message 2 (example: **Amanda Newman**: Good morning, Julie. Happy to be here.)
+etc.
+```
+
+Replace `<user_prompt>` with one of the following summary types, or combine multiple prompts:
+
+| Summary type | User prompt |
+|--------------|-------------|
+| Executive summary | Provide a brief executive summary (2-3 sentences) of the key outcomes and decisions from this transcript. |
+| Detailed summary | Provide a detailed summary of the transcript, covering all major topics, discussions, and outcomes in paragraph form. |
+| Action items | List the specific action items that were assigned during this meeting. Include who is responsible for each item when mentioned. |
+| Key decisions | List the key decisions that were made during this meeting. Focus on concrete decisions and outcomes. |
+| Participants | List the participants mentioned in this transcript. Include their roles or titles when available. |
+| Topics discussed | List the main topics and subjects that were discussed in this meeting. |
+
+<details>
+<summary>Example</summary>
+
+**Example inputs and outputs:**
+
+| Title | Input meeting | Model output |
+|-------|---------------|--------------|
+| Budget planning | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/meeting1.txt) | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/output1.txt) |
+| Design review | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/meeting2.txt) | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/output2.txt) |
+| Coffee chat / social hour | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/meeting3.txt) | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/output3.txt) |
+| Procurement / vendor review | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/meeting4.txt) | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/output4.txt) |
+| Task force meeting | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/meeting5.txt) | [Link](https://huggingface.co/LiquidAI/LFM2-2.6B-Transcript/resolve/main/examples/output5.txt) |
+
+**System Prompt:**
+```
+You are an expert meeting analyst. Analyze the transcript carefully and provide clear, accurate information based on the content.
+```
+
+**User Prompt:**
+```
+Provide a detailed summary of the transcript, covering all major topics, discussions, and outcomes in paragraph form.
+
+Title: Budget Planning Meeting
+Date: March 15, 2024
+Time: 2:00 PM
+Duration: 60 minutes
+Participants: Sarah Chen (Finance Director), Mike Johnson (Operations Manager), Lisa Park (HR Manager)
+----------
+**Sarah Chen**: Good afternoon everyone. Let's start by reviewing our Q1 budget performance.
+**Mike Johnson**: Thanks Sarah. Operations came in 5% under budget this quarter.
+**Lisa Park**: HR expenses were slightly over due to the new hiring initiative, but we're on track for Q2.
+**Sarah Chen**: That's good to hear. For Q2, we need to allocate additional funds for the expansion project.
+**Mike Johnson**: I can provide a detailed breakdown by next week.
+**Lisa Park**: I'll coordinate with Mike on staffing needs for the expansion.
+```
+
+**Assistant Response:**
+```
+The Budget Planning Meeting on March 15, 2024, reviewed Q1 financial performance and planned for Q2. Operations performed well, coming in 5% under budget, while HR expenses were slightly over due to new hiring. The team discussed allocating additional funds for an expansion project in Q2, with Mike Johnson committing to provide a detailed breakdown by next week and Lisa Park coordinating staffing needs.
+```
+
+</details>
+
+**Try it yourself:** See the [meeting summarization cookbook example](https://github.com/Liquid4All/cookbook/tree/main/examples/meeting-summarization) for a complete implementation.
+
+⚠️ **The model is intended for single turn conversations with a specific format.**
