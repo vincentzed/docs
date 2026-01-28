@@ -1,0 +1,20 @@
+# All hail doc master Pau
+* @Paulescu
+
+# Domain owners
+/docs/fine-tuning/ @Liquid4All/fine-tuning-team
+
+/docs/inference @Liquid4All/inference-team
+/docs/inference/*-deployment.mdx @tuliren
+
+/docs/key-concepts/ @mlabonne
+/docs/models/audio-models.mdx @haerski
+/docs/models/vision-models.mdx @ankke
+/docs/models/ @mlabonne
+
+/leap/ @dbhathena
+/leap/edge-sdk/ @iamstuffed
+/leap/leap-bundle/ @tuliren
+/leap/finetuning.mdx @Liquid4All/fine-tuning-team
+
+/.github/workflows/ @tuliren
