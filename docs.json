@@ -217,6 +217,12 @@
       }
     ]
   },
+  "redirects": [
+    {
+      "source": "/lfm/:slug*",
+      "destination": "/docs/:slug*"
+    }
+  ],
   "ai": {
     "chat": true,
     "search": true
