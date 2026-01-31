@@ -1,0 +1,403 @@
+---
+title: "SGLang"
+description: "SGLang is a fast serving framework for large language models. It features RadixAttention for efficient prefix caching, optimized CUDA kernels, and continuous batching for high-throughput, low-latency inference."
+---
+
+<Tip>
+  Use SGLang for low-latency online deployments such as RAG pipelines, search engines, and real-time chat applications.
+</Tip>
+
+SGLang delivers ultra-low latency and high throughput, making it well-suited for production serving scenarios with many concurrent requests. It requires a CUDA-compatible GPU. For CPU-only environments, consider using [llama.cpp](/docs/inference/llama-cpp) instead.
+
+## Installation
+
+Install SGLang following the [official installation guide](https://docs.sglang.io/get_started/install_sglang.html). The recommended method is:
+
+```bash
+pip install --upgrade pip
+pip install uv
+uv pip install "sglang"
+```
+
+For other installation methods (source, Kubernetes), refer to the [SGLang documentation](https://docs.sglang.io/get_started/install_sglang.html).
+
+### Docker
+
+<Note>
+Please use the `dev` tag for LFM model support, as no stable release of SGLang supports it yet. For CUDA 13 environments (B300/GB300), use `lmsysorg/sglang:dev-cu13`.
+</Note>
+
+You can also run SGLang using Docker:
+
+```bash
+docker run --gpus all \
+    --shm-size 32g \
+    -p 30000:30000 \
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    --env "HF_TOKEN=<secret>" \
+    --ipc=host \
+    lmsysorg/sglang:dev \
+    python3 -m sglang.launch_server \
+        --model-path LiquidAI/LFM2.5-1.2B-Instruct \
+        --host 0.0.0.0 \
+        --port 30000 \
+        --chunked-prefill-size -1
+```
+
+## Launching the Server
+
+Start the SGLang server with the following command:
+
+```bash
+python3 -m sglang.launch_server \
+    --model LiquidAI/LFM2.5-1.2B-Instruct \
+    --host 0.0.0.0 \
+    --port 30000 \
+    --chunked-prefill-size -1
+```
+
+Optional parameters:
+
+* `--chunked-prefill-size -1`: Disables chunked prefill for lower latency
+
+### Ultra Low Latency on Blackwell (B300)
+
+Running a 1.2B model on a B300 may sound counterintuitive, but combining `--enable-torch-compile` with Blackwell's architecture unlocks extremely low latency — ideal for latency-sensitive workloads like RAG, search, and real-time chat.
+
+<Tip>
+  If your workload has concurrency under 256, we recommend using `--enable-torch-compile` for significantly lower latency. For pure throughput batch processing at very high concurrency, skip this flag.
+</Tip>
+
+```bash
+python3 -m sglang.launch_server \
+    --model LiquidAI/LFM2.5-1.2B-Instruct \
+    --host 0.0.0.0 \
+    --port 30000 \
+    --enable-torch-compile \
+    --chunked-prefill-size -1
+```
+
+On B300/CUDA 13, use the dedicated Docker image:
+
+```bash
+docker run --gpus all \
+    --shm-size 32g \
+    -p 30000:30000 \
+    -v ~/.cache/huggingface:/root/.cache/huggingface \
+    --env "HF_TOKEN=<secret>" \
+    --ipc=host \
+    lmsysorg/sglang:dev-cu13 \
+    python3 -m sglang.launch_server \
+        --model-path LiquidAI/LFM2.5-1.2B-Instruct \
+        --host 0.0.0.0 \
+        --port 30000 \
+        --enable-torch-compile \
+        --chunked-prefill-size -1
+```
+
+With this configuration, end-to-end latency can be as low as **180ms** per request. Benchmark results on a B300 GPU with CUDA 13:
+
+```
+============ Serving Benchmark Result ============
+Backend:                                 sglang-oai-chat
+Successful requests:                     256
+Benchmark duration (s):                  49.16
+Total input tokens:                      82131
+Total generated tokens:                  54126
+Request throughput (req/s):              5.21
+Input token throughput (tok/s):          1670.54
+Output token throughput (tok/s):         1100.92
+Total token throughput (tok/s):          2771.47
+----------------End-to-End Latency----------------
+Mean E2E Latency (ms):                   191.88
+Median E2E Latency (ms):                 119.90
+P99 E2E Latency (ms):                    760.65
+---------------Time to First Token----------------
+Mean TTFT (ms):                          8.79
+Median TTFT (ms):                        8.11
+P99 TTFT (ms):                           17.45
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          0.86
+Median TPOT (ms):                        0.86
+P99 TPOT (ms):                           0.89
+==================================================
+```
+
+<Accordion title="Benchmark command">
+  ```bash
+  python3 -m sglang.bench_serving \
+      --backend sglang-oai-chat \
+      --num-prompts 256 \
+      --max-concurrency 1 \
+      --random-input-len 1024 \
+      --random-output-len 128 \
+      --warmup-requests 128
+  ```
+</Accordion>
+
+## Chat Completions
+
+Once the server is running, use the OpenAI Python client or any OpenAI-compatible tool:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+response = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-1.2B-Instruct",
+    messages=[
+        {"role": "user", "content": "What is machine learning?"}
+    ],
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+)
+
+print(response.choices[0].message.content)
+```
+
+### Streaming
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+stream = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-1.2B-Instruct",
+    messages=[
+        {"role": "user", "content": "Tell me a story."}
+    ],
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+    stream=True,
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content is not None:
+        print(chunk.choices[0].delta.content, end="")
+```
+
+### Multi-turn Conversations
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+response = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-1.2B-Instruct",
+    messages=[
+        {
+            "role": "system",
+            "content": "You are a knowledgeable historian who provides concise responses.",
+        },
+        {"role": "user", "content": "Tell me about ancient Rome"},
+        {
+            "role": "assistant",
+            "content": "Ancient Rome was a civilization centered in Italy.",
+        },
+        {"role": "user", "content": "What were their major achievements?"},
+    ],
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+)
+
+print(response.choices[0].message.content)
+```
+
+<Accordion title="Curl request example">
+  ```bash
+  curl http://localhost:30000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "LiquidAI/LFM2.5-1.2B-Instruct",
+      "messages": [
+        {"role": "user", "content": "What is AI?"}
+      ],
+      "temperature": 0.3,
+      "min_p": 0.15,
+      "repetition_penalty": 1.05
+    }'
+  ```
+</Accordion>
+
+## Tool Calling
+
+SGLang supports tool calling (function calling) with LFM models via the `--tool-call-parser` flag. Launch the server with tool calling enabled:
+
+```bash
+python3 -m sglang.launch_server \
+    --model LiquidAI/LFM2.5-1.2B-Instruct \
+    --host 0.0.0.0 \
+    --port 30000 \
+    --chunked-prefill-size -1 \
+    --tool-call-parser lfm2
+```
+
+Then use the OpenAI tools API:
+
+```python
+import json
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_candidate_status",
+            "description": "Retrieves the current status of a candidate in the recruitment process",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "candidate_id": {
+                        "type": "string",
+                        "description": "Unique identifier for the candidate",
+                    }
+                },
+                "required": ["candidate_id"],
+            },
+        },
+    }
+]
+
+messages = [
+    {"role": "user", "content": "What is the current status of candidate ID 12345?"}
+]
+
+response = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-1.2B-Instruct",
+    messages=messages,
+    tools=tools,
+    tool_choice="auto",
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+)
+
+# The model may return a tool call
+tool_calls = response.choices[0].message.tool_calls
+if tool_calls:
+    print(f"Function: {tool_calls[0].function.name}")
+    print(f"Arguments: {tool_calls[0].function.arguments}")
+```
+
+For more details on tool parsing configuration, see the [SGLang Tool Parser documentation](https://docs.sglang.io/advanced_features/tool_parser.html).
+
+## Vision Models
+
+### Installation for Vision Models
+
+To use LFM Vision Models with SGLang, install the required transformers version:
+
+```bash
+pip install transformers==5.0.0
+```
+
+<Note>
+Transformers v5 is newly released. If you encounter issues, fall back to the pinned git source:
+```bash
+pip install git+https://github.com/huggingface/transformers.git@3c2517727ce28a30f5044e01663ee204deb1cdbe
+```
+</Note>
+
+### Launching the Server
+
+Serve the vision model with `--trust-remote-code` (required because the vision processor code is loaded from the remote Hugging Face repository):
+
+```bash
+python3 -m sglang.launch_server \
+    --model LiquidAI/LFM2.5-VL-1.6B \
+    --host 0.0.0.0 \
+    --port 30000 \
+    --trust-remote-code
+```
+
+### OpenAI-Compatible API
+
+Then use the OpenAI client with image content:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+response = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-VL-1.6B",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe what you see in this image."},
+                {"type": "image_url", "image_url": {"url": "http://images.cocodataset.org/val2017/000000039769.jpg"}}
+            ]
+        }
+    ],
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+)
+
+print(response.choices[0].message.content)
+```
+
+You can also pass base64-encoded images:
+
+```python
+import base64
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:30000/v1",
+    api_key="None"
+)
+
+# Load and encode image
+with open("path/to/image.jpg", "rb") as f:
+    image_base64 = base64.b64encode(f.read()).decode()
+
+# Chat completion with image
+response = client.chat.completions.create(
+    model="LiquidAI/LFM2.5-VL-1.6B",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Describe this image in detail."},
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}}
+            ]
+        }
+    ],
+    temperature=0.3,
+    min_p=0.15,
+    repetition_penalty=1.05,
+
+)
+
+print(response.choices[0].message.content)
+```
