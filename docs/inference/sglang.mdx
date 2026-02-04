@@ -11,12 +11,12 @@ SGLang delivers ultra-low latency and high throughput, making it well-suited for
 
 ## Installation
 
-Install SGLang following the [official installation guide](https://docs.sglang.io/get_started/install_sglang.html). The recommended method is:
+Install SGLang following the [official installation guide](https://docs.sglang.io/get_started/install_sglang.html). The recommended method is (requires `sglang>=0.5.8`):
 
 ```bash
 pip install --upgrade pip
 pip install uv
-uv pip install "sglang"
+uv pip install "sglang>=0.5.8"
 ```
 
 For other installation methods (source, Kubernetes), refer to the [SGLang documentation](https://docs.sglang.io/get_started/install_sglang.html).
@@ -24,7 +24,7 @@ For other installation methods (source, Kubernetes), refer to the [SGLang docume
 ### Docker
 
 <Note>
-Please use the `dev` tag for LFM model support, as no stable release of SGLang supports it yet. For CUDA 13 environments (B300/GB300), use `lmsysorg/sglang:dev-cu13`.
+Please use the `dev` tag for LFM model support, as no stable release of SGLang supports it yet. For CUDA 13 environments (B300/GB300), use `lmsysorg/sglang:dev-cu13`. The `HF_TOKEN` env var is optional, but it can speed up downloads and reduce retry errors. Without a token, downloads may be slower and can hit more retries. We recommend a read-only Hugging Face token for reliability.
 </Note>
 
 You can also run SGLang using Docker:
@@ -40,8 +40,7 @@ docker run --gpus all \
     python3 -m sglang.launch_server \
         --model-path LiquidAI/LFM2.5-1.2B-Instruct \
         --host 0.0.0.0 \
-        --port 30000 \
-        --chunked-prefill-size -1
+        --port 30000
 ```
 
 ## Launching the Server
@@ -52,13 +51,26 @@ Start the SGLang server with the following command:
 python3 -m sglang.launch_server \
     --model LiquidAI/LFM2.5-1.2B-Instruct \
     --host 0.0.0.0 \
-    --port 30000 \
-    --chunked-prefill-size -1
+    --port 30000
+# Optional: try for lower latency if it helps your workload
+# --chunked-prefill-size -1
 ```
 
 Optional parameters:
 
-* `--chunked-prefill-size -1`: Disables chunked prefill for lower latency
+* `--chunked-prefill-size -1`: Disables chunked prefill. Try this if you see latency improvements for your workload.
+
+## Precision
+
+To run in a specific precision (for example, float16), set the environment variable:
+
+```bash
+export SGLANG_MAMBA_CONV_DTYPE=float16
+```
+
+## Low Latency Tuning
+
+Common low-latency flags include `--enable-torch-compile` and the optional `--chunked-prefill-size -1` if it helps your workload.
 
 ### Ultra Low Latency on Blackwell (B300)
 
@@ -73,8 +85,9 @@ python3 -m sglang.launch_server \
     --model LiquidAI/LFM2.5-1.2B-Instruct \
     --host 0.0.0.0 \
     --port 30000 \
-    --enable-torch-compile \
-    --chunked-prefill-size -1
+    --enable-torch-compile
+# Optional: try for lower latency if it helps your workload
+# --chunked-prefill-size -1
 ```
 
 On B300/CUDA 13, use the dedicated Docker image:
@@ -91,37 +104,25 @@ docker run --gpus all \
         --model-path LiquidAI/LFM2.5-1.2B-Instruct \
         --host 0.0.0.0 \
         --port 30000 \
-        --enable-torch-compile \
-        --chunked-prefill-size -1
+        --enable-torch-compile
 ```
 
-With this configuration, end-to-end latency can be as low as **180ms** per request. Benchmark results on a B300 GPU with CUDA 13:
+Example benchmark on a B300 GPU with CUDA 13 (256 prompts, 1024 input tokens, 128 output tokens, max concurrency 1):
 
-```
-============ Serving Benchmark Result ============
-Backend:                                 sglang-oai-chat
-Successful requests:                     256
-Benchmark duration (s):                  49.16
-Total input tokens:                      82131
-Total generated tokens:                  54126
-Request throughput (req/s):              5.21
-Input token throughput (tok/s):          1670.54
-Output token throughput (tok/s):         1100.92
-Total token throughput (tok/s):          2771.47
-----------------End-to-End Latency----------------
-Mean E2E Latency (ms):                   191.88
-Median E2E Latency (ms):                 119.90
-P99 E2E Latency (ms):                    760.65
----------------Time to First Token----------------
-Mean TTFT (ms):                          8.79
-Median TTFT (ms):                        8.11
-P99 TTFT (ms):                           17.45
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          0.86
-Median TPOT (ms):                        0.86
-P99 TPOT (ms):                           0.89
-==================================================
-```
+| Metric | Value |
+| --- | --- |
+| Successful requests | 256 |
+| Benchmark duration (s) | 49.16 |
+| Request throughput (req/s) | 5.21 |
+| Input token throughput (tok/s) | 1670.54 |
+| Output token throughput (tok/s) | 1100.92 |
+| Total token throughput (tok/s) | 2771.47 |
+| Mean E2E latency (ms) | 191.88 |
+| P99 E2E latency (ms) | 760.65 |
+| Mean TTFT (ms) | 8.79 |
+| P99 TTFT (ms) | 17.45 |
+| Mean TPOT (ms) | 0.86 |
+| P99 TPOT (ms) | 0.89 |
 
 <Accordion title="Benchmark command">
   ```bash
@@ -246,62 +247,10 @@ python3 -m sglang.launch_server \
     --model LiquidAI/LFM2.5-1.2B-Instruct \
     --host 0.0.0.0 \
     --port 30000 \
-    --chunked-prefill-size -1 \
     --tool-call-parser lfm2
 ```
 
-Then use the OpenAI tools API:
-
-```python
-import json
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:30000/v1",
-    api_key="None"
-)
-
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_candidate_status",
-            "description": "Retrieves the current status of a candidate in the recruitment process",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "candidate_id": {
-                        "type": "string",
-                        "description": "Unique identifier for the candidate",
-                    }
-                },
-                "required": ["candidate_id"],
-            },
-        },
-    }
-]
-
-messages = [
-    {"role": "user", "content": "What is the current status of candidate ID 12345?"}
-]
-
-response = client.chat.completions.create(
-    model="LiquidAI/LFM2.5-1.2B-Instruct",
-    messages=messages,
-    tools=tools,
-    tool_choice="auto",
-    temperature=0.3,
-    min_p=0.15,
-    repetition_penalty=1.05,
-
-)
-
-# The model may return a tool call
-tool_calls = response.choices[0].message.tool_calls
-if tool_calls:
-    print(f"Function: {tool_calls[0].function.name}")
-    print(f"Arguments: {tool_calls[0].function.arguments}")
-```
+Then use the OpenAI tools API (same client as in the Chat Completions examples), passing `tools` and `tool_choice="auto"`.
 
 For more details on tool parsing configuration, see the [SGLang Tool Parser documentation](https://docs.sglang.io/advanced_features/tool_parser.html).
 
