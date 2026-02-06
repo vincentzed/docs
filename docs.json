@@ -198,14 +198,30 @@
             "pages": [
               "examples/laptop-examples/invoice-extractor-tool-with-liquid-nanos",
               "examples/laptop-examples/audio-to-text-in-real-time",
-              "examples/laptop-examples/lfm2-english-to-korean"
+              "examples/laptop-examples/lfm2-english-to-korean",
+              "examples/laptop-examples/flight-search-assistant",
+              "examples/laptop-examples/audio-car-cockpit",
+              "examples/laptop-examples/meeting-summarization",
+              "examples/laptop-examples/browser-control"
             ]
           },
           {
-            "group": "iOS Examples",
-            "icon": "apple",
+            "group": "Android Examples",
+            "icon": "robot",
             "pages": [
-              "examples/deploy-models-on-ios/slogan-generator-app"
+              "examples/android/slogan-generator",
+              "examples/android/web-content-summarizer",
+              "examples/android/recipe-generator-constrained-output",
+              "examples/android/vision-language-model-example",
+              "examples/android/leap-koog-agent"
+            ]
+          },
+          {
+            "group": "Web Examples",
+            "icon": "globe",
+            "pages": [
+              "examples/web/vl-webgpu-demo",
+              "examples/web/audio-webgpu-demo"
             ]
           },
           {
