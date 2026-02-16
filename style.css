@@ -48,11 +48,14 @@ a[href*="discord.gg"]:hover img {
 }
 
 /* Purple accent border and arrow on HOVER only in light mode */
-:root:not(.dark) .card-group a[class*="block"][class*="border"]:hover {
+/* Target both card-group cards AND standalone cards */
+:root:not(.dark) .card-group a[class*="block"][class*="border"]:hover,
+:root:not(.dark) a[class*="block"][class*="border"]:hover {
   border-color: #864bc4 !important;
 }
 
-:root:not(.dark) .card-group a[class*="block"]:hover svg {
+:root:not(.dark) .card-group a[class*="block"]:hover svg,
+:root:not(.dark) a[class*="block"]:hover svg {
   color: #864bc4 !important;
 }
 
@@ -60,6 +63,20 @@ a[href*="discord.gg"]:hover img {
 /* Only target the main icon, not the arrow icon (which contains "arrow" in class) */
 :root:not(.dark) .card-group a[class*="block"] svg:not([class*="arrow"]) {
   background-color: #864bc4 !important;
+}
+
+/* Fix GitHub icon visibility in light mode for standalone Cards (not in card-groups) */
+/* Target all Card icons including github icons in example pages */
+:root:not(.dark) [class*="card"] svg:not([class*="arrow"]),
+:root:not(.dark) a[class*="block"][class*="border"] svg:not([class*="arrow"]) {
+  background-color: #864bc4 !important;
+}
+
+/* For mask-image based icons, also set the color property as fallback */
+:root:not(.dark) [class*="card"] [style*="mask-image"],
+:root:not(.dark) a[class*="block"][class*="border"] [style*="mask-image"] {
+  background-color: #864bc4 !important;
+  color: #864bc4 !important;
 }
 
 /* Hide external link arrow on Discord card */
@@ -416,6 +433,33 @@ table a:hover {
   background-color: rgba(134, 75, 196, 0.15) !important;
 }
 
+/* Model name links (first column) - subtle text, no underline, just hover effect */
+table:has(thead th:nth-child(6):not(:nth-child(7))) td:first-child a {
+  color: inherit !important;
+  font-weight: 500 !important;
+  padding: 0.25rem 0.4rem !important;
+  margin: -0.25rem -0.4rem !important;
+  border-radius: 4px !important;
+  background-image: none !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+table:has(thead th:nth-child(6):not(:nth-child(7))) td:first-child a:hover {
+  color: #864bc4 !important;
+  background-color: rgba(134, 75, 196, 0.1) !important;
+  background-image: none !important;
+}
+
+.dark table:has(thead th:nth-child(6):not(:nth-child(7))) td:first-child a {
+  color: inherit !important;
+}
+
+.dark table:has(thead th:nth-child(6):not(:nth-child(7))) td:first-child a:hover {
+  color: #a78bfa !important;
+  background-color: rgba(167, 139, 250, 0.15) !important;
+}
+
 /* Dark mode table styling */
 .dark table thead tr {
   background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%) !important;
@@ -530,13 +574,15 @@ table a:hover {
   color: #e5e7eb !important;
 }
 
-/* Make Colab button images much smaller */
-a[href*="colab.research.google.com"] img,
-img[alt*="Colab"],
-img[alt*="colab"] {
-  height: 20px !important;
+/* Colab badge styling */
+.colab-link a {
+  background-image: none !important;
+  padding-bottom: 0 !important;
+}
+
+.colab-link img {
+  height: 28px !important;
   width: auto !important;
-  max-width: 120px !important;
 }
 
 /* Tab styling - purple accent underline for selected tabs in light mode */

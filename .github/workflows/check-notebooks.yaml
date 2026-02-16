@@ -1,0 +1,70 @@
+name: Check notebooks
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'notebooks/**'
+      - 'scripts/**'
+      - 'snippets/quickstart/**'
+      - '.github/workflows/check-notebooks.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'notebooks/**'
+      - 'scripts/**'
+      - 'snippets/quickstart/**'
+      - '.github/workflows/check-notebooks.yaml'
+  workflow_dispatch:
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: notebooks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev
+
+      - name: Run ruff linter
+        run: |
+          echo "🔍 Running Ruff linter on notebooks..."
+          uv run nbqa ruff . --output-format=github
+          echo ""
+          echo "✅ Ruff checks passed!"
+
+      - name: Run mypy type check
+        run: |
+          echo ""
+          echo "🔍 Running mypy type checker on notebooks..."
+          uv run nbqa mypy .
+          echo "✅ Mypy type checks passed!"
+
+      - name: Check snippet freshness
+        working-directory: .
+        run: |
+          echo "🔍 Checking that generated snippets match notebook source..."
+          python3 scripts/generate_snippets.py --check
+          echo "✅ Snippets are up to date!"
+
+      - name: Summary
+        if: success()
+        run: |
+          echo ""
+          echo "✅ All required checks passed!"
+          echo "📊 Validated $(find . -name '*.ipynb' | wc -l) notebooks"

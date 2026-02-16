@@ -36,7 +36,7 @@
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
-    "href": "https://liquid.ai"
+    "href": "/docs/getting-started/welcome"
   },
   "navbar": {
     "links": [
@@ -60,7 +60,8 @@
             "group": "Get Started",
             "icon": "rocket",
             "pages": [
-              "docs/getting-started/welcome"
+              "docs/getting-started/welcome",
+              "docs/getting-started/connect-ai-tools"
             ]
           },
           {
@@ -93,6 +94,7 @@
               "docs/inference/sglang",
               "docs/inference/mlx",
               "docs/inference/ollama",
+              "docs/inference/onnx",
               {
                 "group": "Other Frameworks",
                 "icon": "server",
@@ -109,6 +111,7 @@
             "group": "Fine-tuning",
             "icon": "sliders",
             "pages": [
+              "docs/fine-tuning/datasets",
               "docs/fine-tuning/trl",
               "docs/fine-tuning/unsloth"
             ]
@@ -131,7 +134,8 @@
             "group": "Get Started",
             "icon": "rocket",
             "pages": [
-              "leap/edge-sdk/overview"
+              "leap/edge-sdk/overview",
+              "docs/getting-started/connect-ai-tools"
             ]
           },
           {
@@ -139,6 +143,7 @@
             "icon": "apple",
             "pages": [
               "leap/edge-sdk/ios/ios-quick-start-guide",
+              "leap/edge-sdk/ios/ai-agent-usage-guide",
               "leap/edge-sdk/ios/model-loading",
               "leap/edge-sdk/ios/conversation-generation",
               "leap/edge-sdk/ios/messages-content",
@@ -154,6 +159,7 @@
             "icon": "robot",
             "pages": [
               "leap/edge-sdk/android/android-quick-start-guide",
+              "leap/edge-sdk/android/ai-agent-usage-guide",
               "leap/edge-sdk/android/model-loading",
               "leap/edge-sdk/android/conversation-generation",
               "leap/edge-sdk/android/messages-content",
@@ -188,7 +194,8 @@
             "group": "Get Started",
             "icon": "rocket",
             "pages": [
-              "examples/index"
+              "examples/index",
+              "docs/getting-started/connect-ai-tools"
             ]
           },
           {
@@ -197,14 +204,30 @@
             "pages": [
               "examples/laptop-examples/invoice-extractor-tool-with-liquid-nanos",
               "examples/laptop-examples/audio-to-text-in-real-time",
-              "examples/laptop-examples/lfm2-english-to-korean"
+              "examples/laptop-examples/lfm2-english-to-korean",
+              "examples/laptop-examples/flight-search-assistant",
+              "examples/laptop-examples/audio-car-cockpit",
+              "examples/laptop-examples/meeting-summarization",
+              "examples/laptop-examples/browser-control"
             ]
           },
           {
-            "group": "iOS Examples",
-            "icon": "apple",
+            "group": "Android Examples",
+            "icon": "robot",
             "pages": [
-              "examples/deploy-models-on-ios/slogan-generator-app"
+              "examples/android/slogan-generator",
+              "examples/android/web-content-summarizer",
+              "examples/android/recipe-generator-constrained-output",
+              "examples/android/vision-language-model-example",
+              "examples/android/leap-koog-agent"
+            ]
+          },
+          {
+            "group": "Web Examples",
+            "icon": "globe",
+            "pages": [
+              "examples/web/vl-webgpu-demo",
+              "examples/web/audio-webgpu-demo"
             ]
           },
           {

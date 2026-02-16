@@ -70,11 +70,14 @@
     }
 
     /* Purple accent border and arrow on HOVER only in light mode */
-    :root:not(.dark) .card-group a[class*="block"][class*="border"]:hover {
+    /* Target both card-group cards AND standalone cards */
+    :root:not(.dark) .card-group a[class*="block"][class*="border"]:hover,
+    :root:not(.dark) a[class*="block"][class*="border"]:hover {
       border-color: #864bc4 !important;
     }
 
-    :root:not(.dark) .card-group a[class*="block"]:hover svg {
+    :root:not(.dark) .card-group a[class*="block"]:hover svg,
+    :root:not(.dark) a[class*="block"]:hover svg {
       color: #864bc4 !important;
     }
 
@@ -82,6 +85,20 @@
     /* Only target the main icon, not the arrow icon (which contains "arrow" in class) */
     :root:not(.dark) .card-group a[class*="block"] svg:not([class*="arrow"]) {
       background-color: #864bc4 !important;
+    }
+
+    /* Fix GitHub icon visibility in light mode for standalone Cards (not in card-groups) */
+    /* Target all Card icons including github icons in example pages */
+    :root:not(.dark) [class*="card"] svg:not([class*="arrow"]),
+    :root:not(.dark) a[class*="block"][class*="border"] svg:not([class*="arrow"]) {
+      background-color: #864bc4 !important;
+    }
+
+    /* For mask-image based icons, also set the color property as fallback */
+    :root:not(.dark) [class*="card"] [style*="mask-image"],
+    :root:not(.dark) a[class*="block"][class*="border"] [style*="mask-image"] {
+      background-color: #864bc4 !important;
+      color: #864bc4 !important;
     }
 
     /* Hide external link arrow on Discord card */
@@ -166,13 +183,12 @@
       color: #e5e7eb !important;
     }
 
-    /* Make Colab button images much smaller */
+    /* Colab button sizing */
     a[href*="colab.research.google.com"] img,
     img[alt*="Colab"],
     img[alt*="colab"] {
-      height: 20px !important;
+      height: 28px !important;
       width: auto !important;
-      max-width: 120px !important;
     }
 
   `;

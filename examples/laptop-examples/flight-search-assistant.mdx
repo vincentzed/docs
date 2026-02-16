@@ -1,0 +1,80 @@
+---
+title: "Flight search assistant with tool calling"
+---
+
+<Card title="View Source Code" icon="github" href="https://github.com/Liquid4All/cookbook/tree/main/examples/flight-search-assistant">
+  Browse the complete example on GitHub
+</Card>
+
+This project demonstrates a Python CLI that leverages the [LFM2.5-1.2B-Thinking](/docs/models/lfm25-1.2b-thinking) model to help users find and book plane tickets through multi-step reasoning and tool calling.
+
+![Flight Search Assistant Demo](https://raw.githubusercontent.com/Liquid4All/cookbook/main/examples/flight-search-assistant/media/demo.gif)
+
+## Quickstart
+
+### 1. Verify uv installation
+
+Check that you have `uv` available on your system:
+
+```bash
+uv --version
+```
+
+If this fails, [install `uv` following these instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+### 2. Clone and build the project
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/Liquid4All/cookbook.git
+cd cookbook/examples/flight-search-assistant
+uv sync
+```
+
+### 3. Run example queries
+
+The assistant accepts natural language requests through the command-line interface:
+
+**Simple flight availability search:**
+```bash
+uv run flight_search.py --query "What flights are available from New York to Paris on 2026-01-19?"
+```
+
+**Direct booking request:**
+```bash
+uv run flight_search.py --query "Book flight AA495 for 2026-02-04"
+```
+
+**Multi-step workflow (search then book):**
+```bash
+uv run flight_search.py --query "Book the cheapest flight from Barcelona to Belgrade on 2026-01-31"
+```
+
+**Complex reasoning task:**
+```bash
+uv run flight_search.py --query "Book the cheapest flight from Barcelona to a US city on the East Coast that is not NYC on 2026-02-14"
+```
+
+<Note>
+  The implementation uses mocked flight data for demonstration purposes, though it supports integration with real APIs like Amadeus, Skyscanner, or Kiwi for production deployment.
+</Note>
+
+## Future Development
+
+The roadmap includes:
+
+- Adding evaluation datasets
+- Implementing performance improvements through GRPO fine-tuning with verifiable rewards
+
+## Need help?
+
+<CardGroup cols={1}>
+
+<Card title="Join our Discord" icon="discord" iconType="brands" href="https://discord.gg/DFU3WQeaYD">
+  Connect with the community and ask questions about this example.
+</Card>
+
+</CardGroup>
+
+[Edit this page](https://github.com/Liquid4All/docs/tree/main/examples/laptop-examples/flight-search-assistant.mdx)
