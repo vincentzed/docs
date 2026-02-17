@@ -3,7 +3,11 @@ title: "SGLang"
 description: "SGLang is a fast serving framework for large language models. It features RadixAttention for efficient prefix caching, optimized CUDA kernels, and continuous batching for high-throughput, low-latency inference."
 ---
 
-SGLang delivers ultra-low latency and high throughput, making it well-suited for production serving scenarios with many concurrent requests. It requires a CUDA-compatible GPU. For CPU-only environments, consider using [llama.cpp](/docs/inference/llama-cpp) instead.
+<Tip>
+  Use SGLang for ultra-low latency, high-throughput production serving with many concurrent requests.
+</Tip>
+
+SGLang requires a CUDA-compatible GPU. For CPU-only environments, consider using [llama.cpp](/docs/inference/llama-cpp) instead.
 
 ## Supported Models
 
@@ -32,65 +36,52 @@ uv pip install "sglang>=0.5.8"
 To use MoE models (e.g., LFM2-8B-A1B) before the 0.5.9 release, install SGLang from the main branch:
 
 ```bash
-pip install --upgrade pip
-pip install uv
 uv pip install "sglang @ git+https://github.com/sgl-project/sglang.git@main#subdirectory=python"
 ```
 
 ## Launching the Server
 
-```bash
-python3 -m sglang.launch_server \
-    --model-path LiquidAI/LFM2.5-1.2B-Instruct \
-    --host 0.0.0.0 \
-    --port 30000 \
-    --tool-call-parser lfm2
-```
-
 <Note>
 By default the model runs in bfloat16. To use float16 instead, add `--dtype float16` and set `export SGLANG_MAMBA_CONV_DTYPE=float16` before launching.
 </Note>
 
-### Docker
-
-<Note>
-Dense LFM models work with any recent SGLang Docker tag. For MoE models (e.g., LFM2-8B-A1B), use the `dev` tag as MoE support is not yet in a stable release. For CUDA 13 environments (B300/GB300), use `lmsysorg/sglang:dev-cu13`. The `HF_TOKEN` env var is optional, but it can speed up downloads and reduce retry errors. Without a token, downloads may be slower and can hit more retries. We recommend a read-only Hugging Face token for reliability.
-</Note>
-
-```bash
-docker run --gpus all \
-    --shm-size 32g \
-    -p 30000:30000 \
-    -v ~/.cache/huggingface:/root/.cache/huggingface \
-    --env "HF_TOKEN=<secret>" \
-    --ipc=host \
-    lmsysorg/sglang:dev \
+<Tabs>
+  <Tab title="Python">
+    ```bash
     python3 -m sglang.launch_server \
         --model-path LiquidAI/LFM2.5-1.2B-Instruct \
         --host 0.0.0.0 \
         --port 30000 \
         --tool-call-parser lfm2
-```
+    ```
+  </Tab>
+
+  <Tab title="Docker">
+    Dense LFM models work with any recent SGLang Docker tag. For MoE models (e.g., LFM2-8B-A1B), use the `dev` tag as MoE support is not yet in a stable release.
+
+    * For CUDA 13 environments (B300/GB300), use `lmsysorg/sglang:dev-cu13`
+    * The `HF_TOKEN` env var is optional, but can speed up downloads and reduce retry errors. We recommend a read-only Hugging Face token for reliability.
+
+    ```bash
+    docker run --gpus all \
+        --shm-size 32g \
+        -p 30000:30000 \
+        -v ~/.cache/huggingface:/root/.cache/huggingface \
+        --env "HF_TOKEN=<secret>" \
+        --ipc=host \
+        lmsysorg/sglang:dev \
+        python3 -m sglang.launch_server \
+            --model-path LiquidAI/LFM2.5-1.2B-Instruct \
+            --host 0.0.0.0 \
+            --port 30000 \
+            --tool-call-parser lfm2
+    ```
+  </Tab>
+</Tabs>
 
 ## Usage
 
 SGLang exposes an OpenAI-compatible API.
-
-### Curl
-
-```bash
-curl http://localhost:30000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "LiquidAI/LFM2.5-1.2B-Instruct",
-    "messages": [
-      {"role": "user", "content": "What is AI?"}
-    ],
-    "temperature": 0
-  }'
-```
-
-### Python (with Tool Calling)
 
 ```python
 from openai import OpenAI
@@ -129,6 +120,20 @@ print(response.choices[0].message)
 ```
 
 For more details on tool use with LFM models, see [Tool Use](/docs/key-concepts/tool-use).
+
+<Accordion title="Curl request example">
+  ```bash
+  curl http://localhost:30000/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+      "model": "LiquidAI/LFM2.5-1.2B-Instruct",
+      "messages": [
+        {"role": "user", "content": "What is AI?"}
+      ],
+      "temperature": 0
+    }'
+  ```
+</Accordion>
 
 ## Low Latency on Blackwell (B300)
 
