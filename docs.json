@@ -91,6 +91,7 @@
               "docs/inference/transformers",
               "docs/inference/llama-cpp",
               "docs/inference/vllm",
+              "docs/inference/sglang",
               "docs/inference/mlx",
               "docs/inference/ollama",
               "docs/inference/onnx",
