@@ -10,7 +10,7 @@ description: "Ollama is a command-line tool for running LLMs locally with a simp
 Ollama uses GGUF models and supports GPU acceleration (CUDA, Metal, ROCm).
 
 <Warning>
-  LFM2 and LFM2.5 VL models currently do not work with Ollama. Our team has opened [this PR](https://github.com/ollama/ollama/pull/14069), that once merged will solve the issue. Do not attempt to use Ollama with LFM2 and LFM2.5 VL models until this PR gets merged into ollama:main branch.
+  The official Ollama v0.17.0 (latest stable) from [ollama.com](https://ollama.com) fails with a `missing tensor 'output_norm.weight'` error on the `lfm2moe` architecture. This affects all LFM MoE models (e.g. LFM2-24B-A2B, LFM2-8A-A1B). To run any LFM MoE model you specifically need [v0.17.1-rc0](https://github.com/ollama/ollama/releases/tag/v0.17.1-rc0) or later.
 </Warning>
 
 <div className="colab-link">
