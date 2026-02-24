@@ -39,33 +39,65 @@ REPLACEMENTS = {
 SNIPPET_CONFIG = {
     "text-transformers": {
         "component_name": "TextTransformers",
-        "props": "{ modelId }",
+        "props": "{ modelId, samplingParams }",
         "replacement_group": "text",
-        "source": "notebook",
+        "source": "config",
         "sections": [
             {"type": "label", "text": "Install:"},
             {"type": "code_block", "language": "bash",
              "code": 'pip install "transformers>=5.0.0" torch accelerate'},
             {"type": "label", "text": "Download & Run:"},
-            {"type": "notebook_code", "language": "python"},
+            {"type": "code_block", "language": "python",
+             "code": (
+                 "from transformers import AutoModelForCausalLM, AutoTokenizer\n"
+                 "\n"
+                 'model_id = "${modelId}"\n'
+                 "model = AutoModelForCausalLM.from_pretrained(\n"
+                 "    model_id,\n"
+                 '    device_map="auto",\n'
+                 '    dtype="bfloat16",\n'
+                 ")\n"
+                 "tokenizer = AutoTokenizer.from_pretrained(model_id)\n"
+                 "\n"
+                 "input_ids = tokenizer.apply_chat_template(\n"
+                 '    [{"role": "user", "content": "What is machine learning?"}],\n'
+                 "    add_generation_prompt=True,\n"
+                 '    return_tensors="pt",\n'
+                 "    tokenize=True,\n"
+                 ").to(model.device)\n"
+                 "\n"
+                 "output = model.generate(input_ids, ${samplingParams}max_new_tokens=512)\n"
+                 "response = tokenizer.decode(output[0][len(input_ids[0]):], skip_special_tokens=True)\n"
+                 "print(response)"
+             )},
         ],
     },
     "text-vllm": {
         "component_name": "TextVllm",
-        "props": "{ modelId }",
+        "props": "{ modelId, samplingParams }",
         "replacement_group": "text",
-        "source": "notebook",
+        "source": "config",
         "sections": [
             {"type": "label", "text": "Install:"},
             {"type": "code_block", "language": "bash",
              "code": "pip install vllm==0.14"},
             {"type": "label", "text": "Run:"},
-            {"type": "notebook_code", "language": "python"},
+            {"type": "code_block", "language": "python",
+             "code": (
+                 "from vllm import LLM, SamplingParams\n"
+                 "\n"
+                 'llm = LLM(model="${modelId}")\n'
+                 "\n"
+                 "sampling_params = SamplingParams(${samplingParams}max_tokens=512)\n"
+                 "\n"
+                 'output = llm.chat("What is machine learning?", sampling_params)\n'
+                 "print(output[0].outputs[0].text)"
+             )},
         ],
     },
     "text-llamacpp": {
         "component_name": "TextLlamacpp",
-        "props": "{ ggufRepo }",
+        "props": "{ ggufRepo, samplingFlags }",
         "replacement_group": "text",
         "source": "config",
         "sections": [
@@ -74,7 +106,7 @@ SNIPPET_CONFIG = {
              "code": "brew install llama.cpp"},
             {"type": "label", "text": "Run:"},
             {"type": "code_block", "language": "bash",
-             "code": "llama-cli -hf ${ggufRepo} -c 4096 --color -i"},
+             "code": "llama-cli -hf ${ggufRepo} -c 4096 --color -i \\\n    ${samplingFlags}"},
             {"type": "raw_html",
              "html": '<p>The <code>-hf</code> flag downloads the model directly from Hugging Face. For other installation methods and advanced usage, see the <a href="/docs/inference/llama-cpp">llama.cpp guide</a>.</p>'},
         ],
@@ -123,7 +155,7 @@ SNIPPET_CONFIG = {
     },
     "vl-llamacpp": {
         "component_name": "VlLlamacpp",
-        "props": "{ ggufRepo }",
+        "props": "{ ggufRepo, samplingFlags }",
         "replacement_group": "vl",
         "source": "config",
         "sections": [
@@ -136,7 +168,7 @@ SNIPPET_CONFIG = {
              "html": '<p>Or download pre-built binaries from <a href="https://github.com/ggml-org/llama.cpp/releases">llama.cpp releases</a>.</p>'},
             {"type": "label", "text": "Run:"},
             {"type": "code_block", "language": "bash",
-             "code": "llama-cli \\\n    -hf ${ggufRepo}:Q4_0 \\\n    --image test_image.jpg \\\n    -p \"What's in this image?\" \\\n    -n 128"},
+             "code": "llama-cli \\\n    -hf ${ggufRepo}:Q4_0 \\\n    --image test_image.jpg \\\n    -p \"What's in this image?\" \\\n    -n 128 \\\n    ${samplingFlags}"},
             {"type": "raw_html",
              "html": '<p>The <code>-hf</code> flag downloads the model directly from Hugging Face. Use <code>--image-max-tokens</code> to control image token budget.</p>'},
             {"type": "raw_html",

@@ -35,7 +35,7 @@ Control text generation behavior using the GUI sidebar or API parameters. Key pa
 * **`top_p`** (`float`, default 1.0): Nucleus sampling - limits to tokens with cumulative probability ≤ top\_p. Typical range: 0.1-1.0
 * **`top_k`** (`int`, default 40): Limits to top-k most probable tokens. Typical range: 1-100
 * **`max_tokens`** (`int`): Maximum number of tokens to generate
-* **`repetition_penalty`** (`float`, default 1.0): Penalty for repeating tokens (>1.0 = discourage repetition). Typical range: 1.0-1.5
+* **`repeat_penalty`** (`float`, default 1.0): Penalty for repeating tokens (>1.0 = discourage repetition). Typical range: 1.0-1.5
 * **`stop`** (`str` or `list[str]`): Strings that terminate generation when encountered
 
 Via the OpenAI-compatible API:
@@ -44,11 +44,9 @@ Via the OpenAI-compatible API:
 response = client.chat.completions.create(
     model="local-model",
     messages=[{"role": "user", "content": "What is machine learning?"}],
-    temperature=0.7,
-    top_p=0.9,
-    top_k=40,
+    temperature=0.1,
     max_tokens=512,
-    repetition_penalty=1.1,
+    extra_body={"top_k": 50, "repeat_penalty": 1.05},
 )
 ```
 
@@ -75,8 +73,9 @@ response = client.chat.completions.create(
     messages=[
         {"role": "user", "content": "What is machine learning?"}
     ],
-    temperature=0.7,
-    max_tokens=512
+    temperature=0.1,
+    max_tokens=512,
+    extra_body={"top_k": 50, "repeat_penalty": 1.05},
 )
 print(response.choices[0].message.content)
 ```
@@ -104,7 +103,9 @@ for chunk in stream:
     -d '{
       "model": "local-model",
       "messages": [{"role": "user", "content": "Hello!"}],
-      "temperature": 0.7
+      "temperature": 0.1,
+      "top_k": 50,
+      "repeat_penalty": 1.05
     }'
   ```
 </Accordion>
