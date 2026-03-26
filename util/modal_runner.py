@@ -6,9 +6,10 @@ app = modal.App("ci-runner")
 @app.function(
     gpu="A10G",
     timeout=600,
+    secrets=[modal.Secret.from_name("huggingface")],
     image=modal.Image.debian_slim(python_version="3.12")
         .apt_install("curl", "wget", "zstd", "git")
-        .pip_install("uv", "typing_extensions>=4.14.0"),
+        .pip_install("uv", "typing_extensions>=4.14.0", "huggingface_hub"),
 )
 def run_code(code: str, pip_packages: list[list[str]] = [], setup_commands: list[str] = []) -> dict:
 
@@ -36,6 +37,18 @@ def run_code(code: str, pip_packages: list[list[str]] = [], setup_commands: list
     # Remove Modal's bundled deps from sys.path to prevent shadowing
     clean_path = [p for p in sys.path if "/__modal/deps" not in p]
 
+    # Prepend HF login if token is available
+    hf_token = os.environ.get("HF_TOKEN")
+    if hf_token:
+        code = (
+            "from huggingface_hub import login as _hf_login\n"
+            f"_hf_login(token={hf_token!r})\n"
+            "print('[ci-runner] HuggingFace login successful')\n"
+            "del _hf_login\n\n"
+        ) + code
+    else:
+        print("[ci-runner] WARNING: No HF_TOKEN found, skipping HuggingFace login")
+
     # Write code to a temp file and run as a subprocess so that
     # stdout/stderr are real file descriptors (required by vLLM, etc.)
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
@@ -50,6 +63,7 @@ def run_code(code: str, pip_packages: list[list[str]] = [], setup_commands: list
         capture_output=True,
         text=True,
         timeout=540,
+        env=env,
     )
 
     os.unlink(script_path)
